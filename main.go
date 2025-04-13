@@ -5,17 +5,26 @@ import (
 	"net/http"
 )
 
+type Task struct{
+	ID int `json:"id"`
+	Title string `json:"title"`
+	Completed bool `json:"completed"`
+}
+
 func main(){
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request){
-		fmt.Println("Received /ping request")
-		fmt.Fprintln(w, "pong")
-	})
+	http.HandleFunc("/task", func(w http.ResponseWriter, r *http.Request){
+		fmt.Println("Received /task request")
 
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request){
-		fmt.Println("Received /hello request")
-		fmt.Fprintln(w, "Hello, Juan!")
-	})
+		task := Task{
+			ID: 1,
+			Title: "Learn Go Basics",
+			Completed: false,
+		}
 
+		w.Header().Set("Content-type", "application/json")
+		json.NewEncoder(w).Encode(task)
+	})
+	
 	fmt.Println("Server is running on port 8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
