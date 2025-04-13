@@ -59,6 +59,12 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 
 		tasks = append(tasks, newTask)
 
+		err = SaveTasks() // <--- save to file
+		if err != nil {
+			http.Error(w, "Failed to save task", http.StatusInternalServerError)
+			return
+		}
+
 		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newTask)
