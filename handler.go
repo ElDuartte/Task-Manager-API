@@ -18,25 +18,52 @@ func helloHandler(w http.ResponseWriter, r *http.Request){
 
 func taskHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Recieved /task request")
-	
-	task := Task{
-		ID: 1,
-		Title: "Learn Go basics",
-		Completed: false,
+
+	if len(tasks) == 0 {
+		http.Error(w, "No tasks aviable", http.StatusNotFound)
+		return
 	}
-	
+
+	firstTask := tasks[0]
+
 	// Tell the browser we send a JSON
 	w.Header().Set("Content-type", "application/json")
 	// Convert struct to JSON
-	json.NewEncoder(w).Encode(task)
+	json.NewEncoder(w).Encode(firstTask)
 }
 
 func tasksHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Println("Received /task request")
+	if r.Method == http.MethodGet {
+		// handle GET: Returns all tasks
+		fmt.Println("Received GET /tasks request")
+		w.Header().Set("Content-type", "application/json")
+		json.NewEncoder(w).Encode(tasks)
+	} else if r.Method == http.MethodPost {
+		// handle POST: Create new task
+		fmt.Println("Recieved POST /tasks request")
 
+		// in this case Task is the type
+		//----------vvvv
+		var newTask Task
+		err := json.NewDecoder(r.Body).Decode(&newTask)
+		fmt.Println("Received new task:", newTask)
 
-	// Tell the browser we send a JSON
-	w.Header().Set("Content-type", "application/json")
-	// Convert struct to JSON
-	json.NewEncoder(w).Encode(tasks)
+		if err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+			return
+		}
+
+		// Set ID manualy increase by 1
+		newTask.ID = len(tasks) + 1
+		newTask.Completed = false
+
+		tasks = append(tasks, newTask)
+
+		w.Header().Set("Content-type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(newTask)
+	} else {
+		// Error method not allowed
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+	}
 }
