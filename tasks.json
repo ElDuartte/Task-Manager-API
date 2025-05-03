@@ -1,6 +1,1 @@
-[
-  { "id": 1, "title": "Learn Docker test", "completed": false },
-  { "id": 2, "title": "Learn Go Basics", "completed": false },
-  { "id": 3, "title": "Build a small API", "completed": false },
-  { "id": 4, "title": "Deploy to production", "completed": false }
-]
+[{"id":1,"title":"Learn Docker test","completed":false,"deleted":false},{"id":2,"title":"Learn Go Basics","completed":false,"deleted":false},{"id":3,"title":"Build a small API","completed":false,"deleted":false},{"id":4,"title":"Deploy to production","completed":false,"deleted":false},{"id":5,"title":"tast ttest tesetes","completed":false,"deleted":false},{"id":6,"title":"tast ttest tesetes","completed":false,"deleted":false},{"id":7,"title":"tast ttest tesetes","completed":false,"deleted":false}]
