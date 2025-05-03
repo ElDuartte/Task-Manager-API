@@ -7,7 +7,7 @@ import (
 )
 
 func pingHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Println("Recieved /ping request")
+  fmt.Println("Recieved /ping request")
 	fmt.Fprint(w, "pong")
 }
 
@@ -72,4 +72,9 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 		// Error method not allowed
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func deleteTaskHandler(w http.ResponseWriter, r *http.Request){
+  fmt.Println("This is w", w)
+  fmt.Println("This is r", r)
 }
