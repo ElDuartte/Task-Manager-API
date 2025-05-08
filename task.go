@@ -5,10 +5,10 @@ import "time"
 type Task struct {
     ID        int          `json:"id"`
     CreatorID int          `json:"creatorId"`
-		ProjectID []int        `json:"projectId"`
-		AssignedToID []int     `json:"assignedToId"`
+		ProjectID []int        `json:"projectId,omitempty"`
+		AssignedToID []int     `json:"assignedToId,omitempty"`
     Title     string       `json:"title"`
-    Completed bool         `json:"completed"`
+    Status   []string      `json:"status"`
     Deleted   bool         `json:"deleted"`
     Edited    time.Time    `json:"time"`
 		CreatedTime time.Time  `json:"createdTime"`
