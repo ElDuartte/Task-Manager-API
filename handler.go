@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func pingHandler(w http.ResponseWriter, r *http.Request){
@@ -55,7 +57,7 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 
 		// Set ID manualy increase by 1
 		newTask.ID = len(tasks) + 1
-		newTask.Completed = false
+		newTask.Status = "To Do"
 
 		tasks = append(tasks, newTask)
 
@@ -75,6 +77,36 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func deleteTaskHandler(w http.ResponseWriter, r *http.Request){
-  fmt.Println("This is w", w)
-  fmt.Println("This is r", r)
+	if r.Method != http.MethodDelete{
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	fmt.Println("Recieved DELETE /tasks/delete request")
+
+	// Parse task ID from query: /task/delete?id=XXX
+	idStr := r.URL.Query().Get("id")
+	if idStr == "" {
+		http.Error(w, "Missing task ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid task ID", http.StatusBadRequest)
+		return
+	}
+
+	// find task and mark it ask deleted
+	for i := range tasks {
+		if tasks[i].ID == id{
+			tasks[i].Deleted = true
+			tasks[i].Edited = time.Now()
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintf(w, "Task %d soft-deleted", id)
+			return
+		}
+	}
+
+	http.Error(w, "Task not found", http.StatusNotFound)
 }
