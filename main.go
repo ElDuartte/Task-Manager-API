@@ -15,7 +15,7 @@ func main(){
 	http.HandleFunc("/hello", helloHandler)
 	http.HandleFunc("/task", taskHandler)
 	http.HandleFunc("/tasks", tasksHandler)
-	http.HandleFunc("/task/delete", deleteHandler)
+	http.HandleFunc("/task/delete", deleteTaskHandler)
 
 	fmt.Println("Server is running on port 8080")
 
