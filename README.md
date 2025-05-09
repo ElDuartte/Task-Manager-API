@@ -1,35 +1,42 @@
+# WIP
+
+# I'm still working on this project
+
+---
+
 # Task-Manager-API
 
 RESTful API built with Golang
 
-## Requirements:
+## Requirements
 
 ```
 go version 1.24.2
 ```
 
-## To start the server:
+## To start the server
 
 ```
 go run .
 ```
 
-## Endpoints URL:
+## Endpoints URL
 
-### GET:
+### GET
 
 ```
 http://localhost:8080/tasks
 ```
 
-### DELETE:
+### DELETE
 
 ```
 http://localhost:8080/task/delete?id=XXX
 ```
+
 _change the XXX to the desire ID_
 
-### POST:
+### POST
 
 ```
 http://localhost:8080/tasks
@@ -45,7 +52,7 @@ http://localhost:8080/tasks
 
 **The API will assign an ID and completed (for now)**
 
-## Response Example:
+## Response Example
 
 ```
 {
