@@ -127,7 +127,7 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	// Extract ID from URL path: /tasks?id=3
-	idStr := r.URL.Query().Get("id") 
+	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -160,7 +160,7 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	// update fields
-	// Its uggly but it's honest work... 
+	// Its uggly but it's honest work...
 	if updatedData.Title != ""{
 		taskToUpdate.Title = updatedData.Title
 	}
@@ -168,27 +168,27 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 	if updatedData.Description != "" {
 		taskToUpdate.Description = updatedData.Description
 	}
-	
+
 	if updatedData.Status != "" {
 		taskToUpdate.Status = updatedData.Status
 	}
-	
+
 	if !updatedData.Deadline.IsZero() {
 		taskToUpdate.Deadline = updatedData.Deadline
 	}
-	
+
 	if len(updatedData.AssignedToID) > 0 {
 		taskToUpdate.AssignedToID = updatedData.AssignedToID
 	}
-	
+
 	if len(updatedData.ProjectID) > 0 {
 		taskToUpdate.ProjectID = updatedData.ProjectID
 	}
-	
+
 	if updatedData.CreatorID != 0 {
 		taskToUpdate.CreatorID = updatedData.CreatorID
 	}
-	
+
 	taskToUpdate.Status = updatedData.Status
 	taskToUpdate.Edited = time.Now()
 
