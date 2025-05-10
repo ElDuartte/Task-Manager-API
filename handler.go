@@ -55,9 +55,10 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 			return
 		}
 
-		// Set ID manualy increase by 1
+		// Set ID, Status, Description
 		newTask.ID = len(tasks) + 1
 		newTask.Status = "To Do"
+		newTask.Description = ""
 
 		tasks = append(tasks, newTask)
 
@@ -109,4 +110,28 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	http.Error(w, "Task not found", http.StatusNotFound)
+}
+
+func editTaskHandler(w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodPut{
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract ID from URL path: /tasks/{id}
+	idStr := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	// find the task
+	var taskToUpdate *Task
+	for i := range tasks {
+		if tasks[i].ID == id{
+			taskToUpdate = &tasks[i]
+			break
+		}
+	}
 }
