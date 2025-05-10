@@ -11,8 +11,8 @@ type Task struct {
     Description  string     `json:"description"`
     Status       string     `json:"status"`
     Deleted      bool       `json:"deleted"`
-	  Deadline     time.Time  `json:"time"`
-    Edited       time.Time  `json:"time"`
+	  Deadline     time.Time  `json:"deadlineTime"`
+    Edited       time.Time  `json:"editedTime"`
 	  CreatedTime  time.Time  `json:"createdTime"`
 }
 
