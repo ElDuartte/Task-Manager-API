@@ -8,6 +8,7 @@ type Task struct {
 		ProjectID    []int      `json:"projectId,omitempty"`
 		AssignedToID []int      `json:"assignedToId,omitempty"`
     Title        string     `json:"title"`
+    Description  string     `json:"description"`
     Status       string     `json:"status"`
     Deleted      bool       `json:"deleted"`
     Edited       time.Time  `json:"time"`
