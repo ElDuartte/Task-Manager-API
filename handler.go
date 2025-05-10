@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -92,6 +92,7 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	// Atoi is "ASCII to Integer"
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid task ID", http.StatusBadRequest)
@@ -103,6 +104,13 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request){
 		if tasks[i].ID == id{
 			tasks[i].Deleted = true
 			tasks[i].Edited = time.Now()
+
+			err = SaveTasks()
+			if err != nil{
+				http.Error(w, "Failed to save deletion", http.StatusInternalServerError)
+				return
+			}
+
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprintf(w, "Task %d soft-deleted", id)
 			return
@@ -118,8 +126,8 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// Extract ID from URL path: /tasks/{id}
-	idStr := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	// Extract ID from URL path: /tasks?id=3
+	idStr := r.URL.Query().Get("id") 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -127,6 +135,8 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 	}
 
 	// find the task
+	// *Task means is a pointer to a Task, not the struct itself
+	// Pointers let you edit the original data and not a copy
 	var taskToUpdate *Task
 	for i := range tasks {
 		if tasks[i].ID == id{
@@ -134,4 +144,62 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 			break
 		}
 	}
+
+	if taskToUpdate == nil{
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
+
+	// decode the data from the request
+	var updatedData Task
+	// &updatedData the syntax "&" is indicating it's a pointer to the variable
+	err = json.NewDecoder(r.Body).Decode(&updatedData)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// update fields
+	// Its uggly but it's honest work... 
+	if updatedData.Title != ""{
+		taskToUpdate.Title = updatedData.Title
+	}
+
+	if updatedData.Description != "" {
+		taskToUpdate.Description = updatedData.Description
+	}
+	
+	if updatedData.Status != "" {
+		taskToUpdate.Status = updatedData.Status
+	}
+	
+	if !updatedData.Deadline.IsZero() {
+		taskToUpdate.Deadline = updatedData.Deadline
+	}
+	
+	if len(updatedData.AssignedToID) > 0 {
+		taskToUpdate.AssignedToID = updatedData.AssignedToID
+	}
+	
+	if len(updatedData.ProjectID) > 0 {
+		taskToUpdate.ProjectID = updatedData.ProjectID
+	}
+	
+	if updatedData.CreatorID != 0 {
+		taskToUpdate.CreatorID = updatedData.CreatorID
+	}
+	
+	taskToUpdate.Status = updatedData.Status
+	taskToUpdate.Edited = time.Now()
+
+	// save changes to file
+	err = SaveTasks()
+	if err != nil {
+		http.Error(w, "Failed to save task", http.StatusInternalServerError)
+		return
+	}
+
+	// RRespond with updated task
+	w.Header().Set("Content-type", "application/json")
+	json.NewEncoder(w).Encode(taskToUpdate)
 }
