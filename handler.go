@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -38,8 +39,48 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 	if r.Method == http.MethodGet {
 		// handle GET: Returns all tasks
 		fmt.Println("Received GET /tasks request")
+
+		q := r.URL.Query().Get("q")
+		status := r.URL.Query().Get("status")
+		creator := r.URL.Query().Get("creatorID")
+		project := r.URL.Query().Get("projectID")
+
+		var result []Task
+
+		for _, t := range tasks {
+			if t.Deleted {
+				continue
+			}
+
+			// 'q' parameter checks for matches in both the title and description
+
+			if q != "" && !strings.Contains(strings.ToLower(t.Title), strings.ToLower(q)) && !strings.Contains(strings.ToLower(t.Description), strings.ToLower(q)){
+				continue
+			}
+
+			if creator != "" {
+				id, err := strconv.Atoi(creator)
+				if err != nil || t.CreatorID != id {
+				  continue
+				}
+			}
+
+			if status != "" && strings.ToLower(t.Status) != strings.ToLower(status) {
+				continue
+			}
+
+			if project != "" {
+				ProjectID, err := strconv.Atoi(project)
+				if err != nil || !containsInt(t.ProjectID, ProjectID){
+					continue
+				}
+			}
+			result = append(result, t)
+		}
+
 		w.Header().Set("Content-type", "application/json")
-		json.NewEncoder(w).Encode(tasks)
+		json.NewEncoder(w).Encode(result)
+		return
 	} else if r.Method == http.MethodPost {
 		// handle POST: Create new task
 		fmt.Println("Recieved POST /tasks request")
@@ -55,10 +96,14 @@ func tasksHandler(w http.ResponseWriter, r *http.Request){
 			return
 		}
 
+		// ToDo create a fake list of users, with roles
+
 		// Set ID, Status, Description
+
+		// Can not assign ProjectID, AssignedToID, Description.
+		// if I assign them when creating it will be over writen.
 		newTask.ID = len(tasks) + 1
 		newTask.Status = "To Do"
-		newTask.Description = ""
 
 		tasks = append(tasks, newTask)
 
@@ -202,4 +247,13 @@ func editTaskHandler(w http.ResponseWriter, r *http.Request){
 	// RRespond with updated task
 	w.Header().Set("Content-type", "application/json")
 	json.NewEncoder(w).Encode(taskToUpdate)
+}
+
+func containsInt (slice []int, val int) bool {
+	for _, v := range slice {
+		if v == val {
+			return true
+		}
+	}
+	return false
 }
